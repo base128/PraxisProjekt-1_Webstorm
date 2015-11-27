@@ -35,7 +35,11 @@ if (Meteor.isClient) {
             return Sessions.find({owner: Meteor.userId()})
         }
     });
-
+    Template.sessionCreated.events({
+       "click .btnDelete": function() {
+           Meteor.call("terminateSession");
+       }
+    });
     Accounts.ui.config({
         passwordSignupFields: "USERNAME_ONLY"
     });
