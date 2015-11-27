@@ -8,26 +8,14 @@ if (Meteor.isClient) {
         "click .btnCreate": function() {
             Meteor.call("createSession");
         },
-        "click .btnJoin": function() {
+        "form #formJoin": function() {
+            var sessionId = event.target.sessionId.value;
             Meteor.call("joinSession", sessionId);
         }
     });
 
     Accounts.ui.config({
         passwordSignupFields: "USERNAME_ONLY"
-    });
-
-    Template.hello.helpers({
-            counter: function () {
-            return Session.get('counter');
-        }
-    });
-
-    Template.hello.events({
-        'click button': function () {
-            // increment the counter when button is clicked
-            Session.set('counter', Session.get('counter') + 1);
-        }
     });
 }
 
@@ -45,14 +33,14 @@ Meteor.methods({
 
         var sessionId = Meteor.call("getRandomId");
 
-        window.alert(sessionId);
+        console.log();
 
-        /*Sessions.insert({
+        Sessions.insert({
             sessionId: sessionId,
             createdAt: new Date(),
             owner: Meteor.userId(),
             username: Meteor.user().username
-        });*/
+        });
     },
     joinSession: function(sessionId) {
 

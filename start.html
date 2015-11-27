@@ -7,17 +7,24 @@
 
     {{> loginButtons }}
     <br/>
-    {{> default }}
+    {{#if sessionId}}
+        {{> default }}
+    {{else}}
+        {{>sessionCreated}}
+    {{/if}}
 </body>
-
-<template name="hello">
-    <button>Click Me</button>
-    <p>You've pressed the button {{counter}} times.</p>
-</template>
 
 <template name="default">
     {{#if currentUser}}<button class="btnCreate">Create a Session</button>{{/if}}
     <br/>
-    <input type="text" name="sessionId" placeholder="Session ID"/>
-    <button class="btnJoin">Join a Session</button>
+    <form id="formJoin">
+        <input id="btnJoin" type="text" name="sessionId" placeholder="Session ID"/>
+        <button type="submit" class="btnJoin">Join a Session</button>
+    </form>
+
+
+</template>
+
+<template name="sessionCreated">
+
 </template>
