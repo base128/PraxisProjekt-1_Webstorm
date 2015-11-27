@@ -16,6 +16,10 @@ if (Meteor.isClient) {
 
     Template.body.helpers({
         sessionExist: function() {
+            if(location.search.split('sessionId=')[1]) {
+                var sessionId = location.search.split('sessionId=')[1];
+                return Sessions.find({sessionId : sessionId});
+            }
             return (Sessions.find({owner: Meteor.userId()})).count();
         }
     });
@@ -32,7 +36,14 @@ if (Meteor.isClient) {
 
     Template.sessionCreated.helpers({
         session: function() {
+            if(location.search.split('sessionId=')[1]) {
+                var sessionId = location.search.split('sessionId=')[1];
+                return Sessions.find({sessionId : sessionId});
+            }
             return Sessions.find({owner: Meteor.userId()})
+        },
+        isOwner: function() {
+            return this.owner === Meteor.userId();
         }
     });
     Template.sessionCreated.events({
@@ -49,39 +60,41 @@ if (Meteor.isServer) {
     Meteor.startup(function () {
         // code to run on server at startup
     });
+
+    Meteor.methods({
+        createSession: function() {
+            if(! Meteor.userId()) {
+                throw new Meteor.Error("not-authorized");
+            }
+            Meteor.call("terminateSession");
+            var sessionId = Meteor.call("getRandomId");
+
+            Sessions.insert({
+                sessionId: sessionId,
+                createdAt: new Date(),
+                owner: Meteor.userId(),
+                username: Meteor.user().username
+            });
+        },
+        terminateSession: function() {
+            Sessions.remove({owner : Meteor.userId()})
+        },
+        getRandomId: function() {
+            if(! Meteor.userId()) {
+                throw new Meteor.Error("not-authorized");
+            }
+
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for( var i=0; i < 5; i++ )
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            return text;
+        }
+    });
 }
-
 Meteor.methods({
-    createSession: function() {
-        if(! Meteor.userId()) {
-            throw new Meteor.Error("not-authorized");
-        }
-        Meteor.call("terminateSession");
-        var sessionId = Meteor.call("getRandomId");
-
-     Sessions.insert({
-            sessionId: sessionId,
-            createdAt: new Date(),
-            owner: Meteor.userId(),
-            username: Meteor.user().username
-        });
-    },
-    terminateSession: function() {
-        Sessions.remove({owner : Meteor.userId()})
-    },
     joinSession: function(sessionId) {
-
-    },
-    getRandomId: function() {
-        if(! Meteor.userId()) {
-            throw new Meteor.Error("not-authorized");
-        }
-
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        for( var i=0; i < 5; i++ )
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
+        return Sessions.find({sessionId : sessionId});
     }
 });

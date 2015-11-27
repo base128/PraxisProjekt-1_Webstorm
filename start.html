@@ -8,6 +8,8 @@
 {{> loginButtons }}
 <br/>
 
+{{log sessionExist}}
+
 {{#if sessionExist}}
     {{> sessionCreated}}
 {{else}}
@@ -20,7 +22,6 @@
     {{#if currentUser}}
         <button class="btnCreate">Create a Session</button>{{/if}}
     <br/>
-
     <form id="formJoin">
         <input id="btnJoin" type="text" name="sessionId" placeholder="Session ID"/>
         <button type="submit" class="btnJoin">Join a Session</button>
@@ -31,7 +32,14 @@
     <h1>Session View</h1>
     {{#each session}}
         <p>SessionID: {{sessionId}}</p>
+
         <p>Username: {{username}}</p>
+
+        <p>Owner: {{owner}}</p>
+
+        <p>Current User: {{currentUser.username}}</p>
+        {{#if isOwner}}
+            <button type="submit" class="btnDelete">Delete Sessions</button>
+        {{/if}}
     {{/each}}
-    <button type="submit" class="btnDelete">Delete Sessions</button>
 </template>
