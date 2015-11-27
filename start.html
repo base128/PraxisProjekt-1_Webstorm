@@ -20,6 +20,7 @@
     {{#if currentUser}}
         <button class="btnCreate">Create a Session</button>{{/if}}
     <br/>
+
     <form id="formJoin">
         <input id="btnJoin" type="text" name="sessionId" placeholder="Session ID"/>
         <button type="submit" class="btnJoin">Join a Session</button>
@@ -30,6 +31,7 @@
     <h1>Session View</h1>
     {{#each session}}
         <p>SessionID: {{sessionId}}</p>
+
         <p>Owner: {{username}}</p>
 
         <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
@@ -46,9 +48,9 @@
         {{/if}}
 
         <table border="1" class="questionsTable">
-        {{#each questions}}
-            {{>questionTemplate}}
-        {{/each}}
+            {{#each questions}}
+                {{>questionTemplate}}
+            {{/each}}
         </table>
     {{/each}}
 </template>
@@ -63,7 +65,9 @@
             </form>
         </td>
         {{#if isOwner}}
-            <td><button class="btnDelQuestion">Delete</button></td>
+            <td>
+                <button class="btnDelQuestion">Delete</button>
+            </td>
         {{/if}}
     </tr>
 </template>
