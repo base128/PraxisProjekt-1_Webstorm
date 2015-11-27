@@ -8,13 +8,13 @@
 {{> loginButtons }}
 <br/>
 
-{{log sessionExist}}
-
 {{#if sessionExist}}
     {{> sessionCreated}}
 {{else}}
     {{> default }}
 {{/if}}
+
+{{>questionTemplate}}
 </body>
 
 <template name="default">
@@ -32,14 +32,28 @@
     <h1>Session View</h1>
     {{#each session}}
         <p>SessionID: {{sessionId}}</p>
+        <p>Owner: {{username}}</p>
 
-        <p>Username: {{username}}</p>
-
-        <p>Owner: {{owner}}</p>
-
-        <p>Current User: {{currentUser.username}}</p>
+        <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
         {{#if isOwner}}
+
+            <br/>
+            <form id="formQuestion">
+                <input type="text" name="questionTxt">
+                <button type="submit" class="btnAddQuestion">Add a question</button>
+            </form>
             <button type="submit" class="btnDelete">Delete Sessions</button>
+
+        {{else}}
+            <button type="submit" class="btnLeave">Leave Session</button>
         {{/if}}
     {{/each}}
+</template>
+
+<template name="questionTemplate">
+    <table>
+        {{#each questions}}
+            <tr>{{questions.question}}</tr>
+        {{/each}}
+    </table>
 </template>

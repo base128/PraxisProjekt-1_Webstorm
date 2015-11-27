@@ -1,4 +1,5 @@
 Sessions = new Mongo.Collection("sessions");
+Questions = new Mongo.Collection("questions");
 
 if (Meteor.isClient) {
     // counter starts at 0
@@ -18,7 +19,7 @@ if (Meteor.isClient) {
         sessionExist: function() {
             if(location.search.split('sessionId=')[1]) {
                 var sessionId = location.search.split('sessionId=')[1];
-                return Sessions.find({sessionId : sessionId});
+                return Sessions.find({sessionId : sessionId}).count();
             }
             return (Sessions.find({owner: Meteor.userId()})).count();
         }
@@ -31,6 +32,10 @@ if (Meteor.isClient) {
         "form #formJoin": function() {
             var sessionId = event.target.sessionId.value;
             Meteor.call("joinSession", sessionId);
+        },
+        "form #formQuestion": function() {
+            var text = event.target.questionTxt.value;
+            Meteor.call("addQuestion", text);
         }
     });
 
@@ -46,11 +51,22 @@ if (Meteor.isClient) {
             return this.owner === Meteor.userId();
         }
     });
+
     Template.sessionCreated.events({
-       "click .btnDelete": function() {
-           Meteor.call("terminateSession");
-       }
+        "click .btnDelete": function() {
+            Meteor.call("terminateSession");
+        },
+        "click .btnLeave": function() {
+            Meteor.call("leaveSession");
+        }
     });
+
+    Template.questionTemplate.helpers({
+        questions: function() {
+            return Questions.find({owner: owner})
+        }
+    });
+
     Accounts.ui.config({
         passwordSignupFields: "USERNAME_ONLY"
     });
@@ -96,5 +112,15 @@ if (Meteor.isServer) {
 Meteor.methods({
     joinSession: function(sessionId) {
         return Sessions.find({sessionId : sessionId});
+    },
+    leaveSession: function() {
+        location.href="/";
+    },
+    addQuestion: function(text, owner) {
+        Questions.insert({
+            owner: owner,
+            type: text,
+            question: text
+        })
     }
 });
