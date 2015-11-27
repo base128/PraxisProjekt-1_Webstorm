@@ -13,8 +13,6 @@
 {{else}}
     {{> default }}
 {{/if}}
-
-{{>questionTemplate}}
 </body>
 
 <template name="default">
@@ -35,9 +33,8 @@
         <p>Owner: {{username}}</p>
 
         <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
+        <br/>
         {{#if isOwner}}
-
-            <br/>
             <form id="formQuestion">
                 <input type="text" name="questionTxt">
                 <button type="submit" class="btnAddQuestion">Add a question</button>
@@ -47,13 +44,26 @@
         {{else}}
             <button type="submit" class="btnLeave">Leave Session</button>
         {{/if}}
+
+        <table border="1" class="questionsTable">
+        {{#each questions}}
+            {{>questionTemplate}}
+        {{/each}}
+        </table>
     {{/each}}
 </template>
 
 <template name="questionTemplate">
-    <table>
-        {{#each questions}}
-            <tr>{{questions.question}}</tr>
-        {{/each}}
-    </table>
+    <tr class="questionsRow">
+        <td>{{question}}</td>
+        <td>
+            <form id="formYesNoAnswer">
+                <input type="radio" name="yesNo" value="yes" checked>Yes
+                <input type="radio" name="yesNo" value="no">No
+            </form>
+        </td>
+        {{#if isOwner}}
+            <td><button class="btnDelQuestion">Delete</button></td>
+        {{/if}}
+    </tr>
 </template>

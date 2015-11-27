@@ -29,13 +29,9 @@ if (Meteor.isClient) {
         "click .btnCreate": function() {
             Meteor.call("createSession");
         },
-        "form #formJoin": function() {
+        "submit #formJoin": function() {
             var sessionId = event.target.sessionId.value;
             Meteor.call("joinSession", sessionId);
-        },
-        "form #formQuestion": function() {
-            var text = event.target.questionTxt.value;
-            Meteor.call("addQuestion", text);
         }
     });
 
@@ -49,6 +45,9 @@ if (Meteor.isClient) {
         },
         isOwner: function() {
             return this.owner === Meteor.userId();
+        },
+        questions: function() {
+            return Questions.find({owner: this.owner})
         }
     });
 
@@ -58,13 +57,24 @@ if (Meteor.isClient) {
         },
         "click .btnLeave": function() {
             Meteor.call("leaveSession");
+        },
+        "submit #formQuestion": function(event) {
+            event.preventDefault();
+            var text = event.target.questionTxt.value;
+            Meteor.call("addQuestion", text, this.owner);
         }
     });
 
     Template.questionTemplate.helpers({
-        questions: function() {
-            return Questions.find({owner: owner})
+        isOwner: function() {
+            return this.owner === Meteor.userId();
         }
+    });
+
+    Template.questionTemplate.events({
+       "click .btnDelQuestion": function() {
+           Meteor.call("delQuestion", this._id);
+       }
     });
 
     Accounts.ui.config({
@@ -122,5 +132,8 @@ Meteor.methods({
             type: text,
             question: text
         })
+    },
+    delQuestion: function(id) {
+        Questions.remove({_id : id});
     }
 });
