@@ -99,6 +99,7 @@ if (Meteor.isServer) {
                 throw new Meteor.Error("not-authorized");
             }
             Meteor.call("terminateSession");
+            Meteor.call("terminateQuestions");
             var sessionId = Meteor.call("getRandomId");
 
             Sessions.insert({
@@ -109,7 +110,11 @@ if (Meteor.isServer) {
             });
         },
         terminateSession: function () {
+            Meteor.call('terminateQuestions');
             Sessions.remove({owner: Meteor.userId()})
+        },
+        terminateQuestions: function () {
+            Questions.remove({owner: Meteor.userId()})
         },
         getRandomId: function () {
             if (!Meteor.userId()) {
