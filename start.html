@@ -1,14 +1,23 @@
 <head>
-  <title>start</title>
+    <title>TH Köln ARS</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+    <h1>Welcome to THK ARS!</h1>
 
-  {{> hello}}
+    {{> loginButtons }}
+    <br/>
+    {{> default }}
 </body>
 
 <template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+    <button>Click Me</button>
+    <p>You've pressed the button {{counter}} times.</p>
+</template>
+
+<template name="default">
+    {{#if currentUser}}<button class="btnCreate">Create a Session</button>{{/if}}
+    <br/>
+    <input type="text" name="sessionId" placeholder="Session ID"/>
+    <button class="btnJoin">Join a Session</button>
 </template>
