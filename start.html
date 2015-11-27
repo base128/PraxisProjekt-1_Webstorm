@@ -3,28 +3,34 @@
 </head>
 
 <body>
-    <h1>Welcome to THK ARS!</h1>
+<h1>Welcome to THK ARS!</h1>
 
-    {{> loginButtons }}
-    <br/>
-    {{#if sessionId}}
-        {{> default }}
-    {{else}}
-        {{>sessionCreated}}
-    {{/if}}
+{{> loginButtons }}
+<br/>
+
+{{#if sessionExist}}
+    {{> sessionCreated}}
+{{else}}
+    {{> default }}
+{{/if}}
 </body>
 
 <template name="default">
-    {{#if currentUser}}<button class="btnCreate">Create a Session</button>{{/if}}
+    <h1>Create a Sessions</h1>
+    {{#if currentUser}}
+        <button class="btnCreate">Create a Session</button>{{/if}}
     <br/>
+
     <form id="formJoin">
         <input id="btnJoin" type="text" name="sessionId" placeholder="Session ID"/>
         <button type="submit" class="btnJoin">Join a Session</button>
     </form>
-
-
 </template>
 
 <template name="sessionCreated">
-
+    <h1>Session View</h1>
+    {{#each session}}
+        <p>SessionID: {{sessionId}}</p>
+        <p>Username: {{username}}</p>
+    {{/each}}
 </template>

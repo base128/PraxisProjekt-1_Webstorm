@@ -4,6 +4,22 @@ if (Meteor.isClient) {
     // counter starts at 0
     Session.setDefault('counter', 0);
 
+    Handlebars.registerHelper("isNull", function(value) {
+        return value === null;
+    });
+    Handlebars.registerHelper("isEmpty", function(object) {
+        return jQuery.isEmptyObject(object);
+    });
+    Handlebars.registerHelper("log", function(object) {
+        return console.log(object);
+    });
+
+    Template.body.helpers({
+        sessionExist: function() {
+            return (Sessions.find({owner: Meteor.userId()})).count();
+        }
+    });
+
     Template.body.events({
         "click .btnCreate": function() {
             Meteor.call("createSession");
@@ -11,6 +27,12 @@ if (Meteor.isClient) {
         "form #formJoin": function() {
             var sessionId = event.target.sessionId.value;
             Meteor.call("joinSession", sessionId);
+        }
+    });
+
+    Template.sessionCreated.helpers({
+        session: function() {
+            return Sessions.find({owner: Meteor.userId()})
         }
     });
 
@@ -30,17 +52,18 @@ Meteor.methods({
         if(! Meteor.userId()) {
             throw new Meteor.Error("not-authorized");
         }
-
+        Meteor.call("terminateSession");
         var sessionId = Meteor.call("getRandomId");
 
-        console.log();
-
-        Sessions.insert({
+     Sessions.insert({
             sessionId: sessionId,
             createdAt: new Date(),
             owner: Meteor.userId(),
             username: Meteor.user().username
         });
+    },
+    terminateSession: function() {
+        Sessions.remove({owner : Meteor.userId()})
     },
     joinSession: function(sessionId) {
 
@@ -55,7 +78,6 @@ Meteor.methods({
 
         for( var i=0; i < 5; i++ )
             text += possible.charAt(Math.floor(Math.random() * possible.length));
-
         return text;
     }
 });
