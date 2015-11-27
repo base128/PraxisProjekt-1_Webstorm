@@ -3,24 +3,35 @@
 </head>
 
 <body>
-<h1>Welcome to THK ARS!</h1>
+<div class="header container">
+    <div class="row">
+        <div class="col-sm-4"><img class="logoImg" src="/img/logo.png" alt="TH Köln logo"/></div>
+        <div class="col-sm-8"><h1 class="title">Welcome to THK ARS!</h1></div>
+    </div>
+</div>
+<div class="container content">
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 class="login">Login: {{> loginButtons }}</h3>
+        </div>
+        <div class="col-sm-12">
+            {{#if sessionExist}}
+                {{> sessionCreated}}
+            {{else}}
+                {{> default }}
+            {{/if}}
+        </div>
 
-{{> loginButtons }}
-<br/>
-
-{{#if sessionExist}}
-    {{> sessionCreated}}
-{{else}}
-    {{> default }}
-{{/if}}
+    </div>
+</div>
 </body>
 
 <template name="default">
-    <h1>Create a Sessions</h1>
+    <h2>Create a Sessions</h2>
     {{#if currentUser}}
+        <div class="divider clearfix"></div>
         <button class="btnCreate">Create a Session</button>{{/if}}
-    <br/>
-
+    <div class="divider clearfix"></div>
     <form id="formJoin">
         <input id="btnJoin" type="text" name="sessionId" placeholder="Session ID"/>
         <button type="submit" class="btnJoin">Join a Session</button>
@@ -28,24 +39,35 @@
 </template>
 
 <template name="sessionCreated">
-    <h1>Session View</h1>
+    <h2>Session View</h2>
     {{#each session}}
         <p>SessionID: {{sessionId}}</p>
 
         <p>Owner: {{username}}</p>
 
         <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
-        <br/>
-        {{#if isOwner}}
-            <form id="formQuestion">
-                <input type="text" name="questionTxt">
-                <button type="submit" class="btnAddQuestion">Add a question</button>
-            </form>
-            <button type="submit" class="btnDelete">Delete Sessions</button>
 
-        {{else}}
-            <button type="submit" class="btnLeave">Leave Session</button>
-        {{/if}}
+        <div class="divider"></div>
+
+        <div class="row">
+            {{#if isOwner}}
+                <div class="col-sm-6 col-xs-12">
+                    <form id="formQuestion">
+                        <input type="text" name="questionTxt">
+                        <button type="submit" class="btnAddQuestion">Add a question</button>
+                    </form>
+                </div>
+                <div class="col-sm-6 col-xs-12">
+                    <button type="submit" class="btnDelete">Delete Sessions</button>
+                </div>
+
+            {{else}}
+                <div class="col-sm-12">
+                    <button type="submit" class="btnLeave">Leave Session</button>
+                </div>
+            {{/if}}
+        </div>
+        <div class="divider clearfix"></div>
 
         <table border="1" class="questionsTable">
             {{#each questions}}
@@ -57,7 +79,7 @@
 
 <template name="questionTemplate">
     <tr class="questionsRow">
-        <td>{{question}}</td>
+        <td><span>{{question}}</span></td>
         <td>
             <form id="formYesNoAnswer">
                 <input type="radio" name="yesNo" value="yes" checked>Yes

@@ -1,1 +1,66 @@
 /* CSS declarations go here */
+body {
+    background: #f0f0f0;
+}
+.header {
+    position: relative;
+    color: #000;
+    text-decoration: none;
+    background-color: #fff;
+    margin-bottom: 15px;
+}
+.header .logoImg {
+    padding-top: 5px;
+    width: 100%;
+    padding-bottom: 5px;
+}
+h1.title {
+    margin-top: 0;
+    padding-top: 20px;
+    width: 100%;
+}
+div.divider {
+    padding: 0 15px;
+    margin: 15px 0;
+    border-bottom: 2px solid #808080;
+}
+div.container.content {
+    padding-bottom: 15px;
+}
+.container {
+    background-color: #fff;
+}
+h3.login {
+    padding-bottom: 5px;
+    border-bottom: 2px solid #808080;
+}
+#login-buttons a, .accounts-dialog a {
+    text-decoration: none;
+}
+table {
+    width: 100%;
+}
+table button {
+    width: 100%;
+}
+table td span {
+    padding: 5px;
+}
+#formYesNoAnswer {
+    text-align: center;
+}
+#formQuestion input{
+    width: 79%;
+}
+/*CSS Only for Mobile*/
+@media (max-width: 768px) {
+    h1 {
+        font-size: 28px;
+    }
+    #formQuestion input{
+        width: 100%;
+    }
+    button {
+        width: 100%;
+    }
+}
