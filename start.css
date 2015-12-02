@@ -9,6 +9,10 @@ body {
     background-color: #fff;
     margin-bottom: 15px;
 }
+.pre {
+    white-space: pre;
+    padding: 5px;
+}
 .header .logoImg {
     padding-top: 5px;
     width: 100%;
@@ -45,6 +49,9 @@ table button {
 }
 table td span {
     padding: 5px;
+}
+th {
+    text-align: center;
 }
 #formYesNoAnswer {
     text-align: center;

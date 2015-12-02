@@ -28,7 +28,7 @@
 </body>
 
 <template name="default">
-    <h2>Create a Sessions</h2>
+    <h2>Create a Session</h2>
     {{#if currentUser}}
         <div class="divider clearfix"></div>
         <button class="btnCreate">Create a Session</button>
@@ -49,6 +49,10 @@
 
         <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
 
+        <p>Participants: {{participants}}</p>
+
+        <p>Answers received: {{answersReceived}}</p>
+
         <div class="divider"></div>
 
         <div class="row">
@@ -56,11 +60,12 @@
                 <div class="col-sm-6 col-xs-12">
                     <form id="formQuestion">
                         <input type="text" name="questionTxt">
-                        <button type="submit" class="btnAddQuestion">Add a question</button>
+                        <br/>
+                        <button type="submit" class="btnAddQuestion">Add this question</button>
                     </form>
                 </div>
                 <div class="col-sm-6 col-xs-12">
-                    <button type="submit" class="btnDelete">Delete Sessions</button>
+                    <button type="submit" class="btnTerminate">Terminate Session</button>
                 </div>
 
             {{else}}
@@ -72,23 +77,45 @@
         <div class="divider clearfix"></div>
 
         <table border="1" class="questionsTable">
+            <tr class="trHeader">
+                <th>Question</th>
+                {{#if isOwner}}
+                    <th>Answers</th>
+                    <th>Deletion</th>
+                {{else}}
+                    <th>Option</th>
+                {{/if}}
+
+            </tr>
             {{#each questions}}
                 {{>questionTemplate}}
             {{/each}}
         </table>
+
+        {{#unless isOwner}}
+            <br/>
+            <button type="button" id="btnSubmitAnswers">Submit answers</button>
+        {{/unless}}
     {{/each}}
 </template>
 
 <template name="questionTemplate">
     <tr class="questionsRow">
+        {{log this}}
         <td><span>{{question}}</span></td>
-        <td>
-            <form id="formYesNoAnswer">
-                <input type="radio" name="yesNo" value="yes" checked>Yes
-                <input type="radio" name="yesNo" value="no">No
-            </form>
-        </td>
+        {{#unless isOwner}}
+            <td>
+                <form class="formYesNoAnswer">
+                    <input type="radio" class="YesNoRadioButtons" name="yesNo" value="yes" checked>Yes
+                    <input type="radio" class="YesNoRadioButtons" name="yesNo" value="no">No
+                </form>
+            </td>
+        {{/unless}}
+
         {{#if isOwner}}
+            <td>
+                <span class="pre">{{answers2}}</span>
+            </td>
             <td>
                 <button class="btnDelQuestion">Delete</button>
             </td>

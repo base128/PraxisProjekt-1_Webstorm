@@ -51,16 +51,33 @@ if (Meteor.isClient) {
     });
 
     Template.sessionCreated.events({
-        "click .btnDelete": function () {
-            Meteor.call("terminateSession");
+        "click .btnTerminate": function () {
+            Meteor.call("terminateSession", this.sessionId);
         },
         "click .btnLeave": function () {
-            Meteor.call("leaveSession");
+            Meteor.call("leaveSession", this.sessionId);
         },
         "submit #formQuestion": function (event) {
             event.preventDefault();
             var text = event.target.questionTxt.value;
-            Meteor.call("addQuestion", text, this.owner);
+            event.target.questionTxt.value = "";
+            Meteor.call("addQuestion", this.sessionId, text, this.owner);
+        },
+        "click #btnSubmitAnswers": function() {
+            var forms = document.getElementsByClassName("formYesNoAnswer");
+            if(forms.length > 0) {
+                var answer = [];
+                for(var i = 0; i < forms.length; i++) {
+                    var radioButtons = forms[i].getElementsByClassName("YesNoRadioButtons");
+                    for(var j = 0; j < 2; j++) {
+                        if(radioButtons[j].checked) {
+                            answer.push(radioButtons[j].value);
+                        }
+                    }
+                }
+
+                Meteor.call("insertAnswer", answer, this.sessionId, Meteor.userId());
+            }
         }
     });
     //endregion
@@ -69,6 +86,30 @@ if (Meteor.isClient) {
     Template.questionTemplate.helpers({
         isOwner: function () {
             return this.owner === Meteor.userId();
+        },
+        answers2: function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function(bla) {
+               answers.push(bla.answers);
+            });
+
+            if(answers.length > 0) {
+                var yesCount = 0, noCount = 0;
+
+                for(var j = 0; j < answers[0].length; j++) {
+                    if(answers[0][j][0] == "yes") {
+                        yesCount = yesCount + 1;
+                    } else if(answers[0][j][0] == "no") {
+                        noCount = noCount + 1;
+                    }
+                }
+
+                //return answers[0].length;
+                return "Yes: " + yesCount + "\n No: " + noCount;
+            }
+            return answers;
         }
     });
 
@@ -84,6 +125,10 @@ if (Meteor.isClient) {
         passwordSignupFields: "USERNAME_ONLY"
     });
     //endregion
+
+    Meteor.methods({
+
+    });
 }
 //endregion
 
@@ -99,22 +144,50 @@ if (Meteor.isServer) {
                 throw new Meteor.Error("not-authorized");
             }
             Meteor.call("terminateSession");
-            Meteor.call("terminateQuestions");
             var sessionId = Meteor.call("getRandomId");
 
             Sessions.insert({
                 sessionId: sessionId,
                 createdAt: new Date(),
                 owner: Meteor.userId(),
-                username: Meteor.user().username
+                username: Meteor.user().username,
+                participants: 0,
+                answersReceived: 0
             });
         },
-        terminateSession: function () {
-            Meteor.call('terminateQuestions');
-            Sessions.remove({owner: Meteor.userId()})
+        incParticipants: function(sessionId) {
+            Sessions.update({sessionId: sessionId}, {$inc : { participants : 1 }});
         },
-        terminateQuestions: function () {
-            Questions.remove({owner: Meteor.userId()})
+        decParticipants: function(sessionId) {
+            Sessions.update({sessionId: sessionId}, {$inc : { participants : -1 }});
+        },
+        incAnswers: function(sessionId) {
+            Sessions.update({sessionId: sessionId}, {$inc : { answersReceived : 1 }});
+        },
+        insertAnswer: function(answer, sessionId, userId) {
+            Meteor.call("incAnswers", sessionId);
+
+            var questionIdsCursor = Questions.find({sessionId:sessionId}, {_id:1});
+
+            var questionIds = [];
+
+            questionIdsCursor.forEach(function(post) { questionIds.push(post._id) });
+
+            console.log(questionIds);
+
+            for(var i = 0; i < answer.length; i++) {
+                var toInsert = [answer[i], userId];
+                var qId = questionIds[i];
+                console.log("Inserting: " + toInsert + " into " + qId);
+                Questions.update({_id: qId}, {$push : { answers: toInsert}});
+            }
+        },
+        terminateSession: function (sessionId) {
+            Meteor.call("terminateQuestions", sessionId);
+            Sessions.remove({owner: Meteor.userId()});
+        },
+        terminateQuestions: function (sessionId) {
+            Questions.remove({sessionId: sessionId});
         },
         getRandomId: function () {
             if (!Meteor.userId()) {
@@ -127,6 +200,15 @@ if (Meteor.isServer) {
             for (var i = 0; i < 5; i++)
                 text += possible.charAt(Math.floor(Math.random() * possible.length));
             return text;
+        },
+        addQuestion: function (sessionId, text, owner) {
+            Questions.insert({
+                sessionId: sessionId,
+                owner: owner,
+                type: text,
+                question: text,
+                answers: []
+            });
         }
     });
 }
@@ -135,17 +217,12 @@ if (Meteor.isServer) {
 //region Methods
 Meteor.methods({
     joinSession: function (sessionId) {
+        Meteor.call("incParticipants", sessionId);
         return Sessions.find({sessionId: sessionId});
     },
-    leaveSession: function () {
+    leaveSession: function (sessionId) {
+        Meteor.call("decParticipants", sessionId);
         location.href = "/";
-    },
-    addQuestion: function (text, owner) {
-        Questions.insert({
-            owner: owner,
-            type: text,
-            question: text
-        })
     },
     delQuestion: function (id) {
         Questions.remove({_id: id});
