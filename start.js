@@ -173,36 +173,24 @@ if (Meteor.isServer) {
 
             // Get the question Ids the user is trying to answer
             var questionIdsCursor = Questions.find({sessionId:sessionId}, {_id:1});
-
             var questionIds = [];
 
             questionIdsCursor.forEach(function(post) { questionIds.push(post._id) });
 
-            // Compare the two arrays
-            var continueAllowed = true;
+            // Reduce the questions the user is trying to answer with the questions he already answered
+            // The result is an array of question Ids the user is allowed to answer (or an empty array)
+            var diff = $(questionIds).not(answeredQuestionIds).get();
 
-            if(answeredQuestionIds.length != questionIds) {
-                continueAllowed = false;
-            } else {
-                for(var j = 0; j < questionIds.length; j++) {
-                    for(var k = 0; k < answeredQuestionIds.length; k++) {
+            console.log(answeredQuestionIds);
+            console.log(questionIds);
 
-                    }
-                }
+            for(var i = 0; i < answer.length; i++) {
+                var toInsert = [answer[i], userId];
+                var qId = questionIds[i];
+                console.log("Inserting: " + toInsert + " into " + qId);
+                Questions.update({_id: qId}, {$push : { answers: toInsert}});
             }
-
-            if(continueAllowed) {
-                console.log(answeredQuestionIds);
-                console.log(questionIds);
-
-                for(var i = 0; i < answer.length; i++) {
-                    var toInsert = [answer[i], userId];
-                    var qId = questionIds[i];
-                    console.log("Inserting: " + toInsert + " into " + qId);
-                    Questions.update({_id: qId}, {$push : { answers: toInsert}});
-                }
-                Meteor.call("incAnswers", sessionId);
-            }
+            Meteor.call("incAnswers", sessionId);
         },
         terminateSession: function (sessionId) {
             Meteor.call("terminateQuestions", sessionId);
