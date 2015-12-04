@@ -71,7 +71,7 @@ if (Meteor.isClient) {
                     var radioButtons = forms[i].getElementsByClassName("YesNoRadioButtons");
                     for(var j = 0; j < 2; j++) {
                         if(radioButtons[j].checked) {
-                            answer.push(radioButtons[j].value);
+                            answer.push([radioButtons[j].value, forms[i].data("questId")]);
                         }
                     }
                 }
@@ -184,12 +184,21 @@ if (Meteor.isServer) {
             console.log(answeredQuestionIds);
             console.log(questionIds);
 
-            for(var i = 0; i < answer.length; i++) {
+            for(var i = 0; i < diff.length; i++) {
+                if(answer[i][1] == diff[i]) {
+                    var toInsert = [answer[i][0], userId];
+                    var qId = diff[i];
+                    console.log("Inserting: " + toInsert + " into " + qId);
+                    Questions.update({_id: qId}, {$push : { answers: toInsert}});
+                }
+            }
+
+            /*for(var i = 0; i < answer.length; i++) {
                 var toInsert = [answer[i], userId];
                 var qId = questionIds[i];
                 console.log("Inserting: " + toInsert + " into " + qId);
                 Questions.update({_id: qId}, {$push : { answers: toInsert}});
-            }
+            }*/
             Meteor.call("incAnswers", sessionId);
         },
         terminateSession: function (sessionId) {

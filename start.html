@@ -109,7 +109,7 @@
         <td><span>{{question}}</span></td>
         {{#unless isOwner}}
             <td>
-                <form class="formYesNoAnswer">
+                <form class="formYesNoAnswer" data-questId="{{this._id}}">
                     <input type="radio" class="YesNoRadioButtons" name="yesNo" value="yes" checked>Yes
                     <input type="radio" class="YesNoRadioButtons" name="yesNo" value="no">No
                 </form>
