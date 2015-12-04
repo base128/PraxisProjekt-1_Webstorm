@@ -71,7 +71,7 @@ if (Meteor.isClient) {
                     var radioButtons = forms[i].getElementsByClassName("YesNoRadioButtons");
                     for(var j = 0; j < 2; j++) {
                         if(radioButtons[j].checked) {
-                            answer.push([radioButtons[j].value, forms[i].data("questId")]);
+                            answer.push([radioButtons[j].value, forms[i]["questId"]]);
                         }
                     }
                 }
@@ -179,7 +179,22 @@ if (Meteor.isServer) {
 
             // Reduce the questions the user is trying to answer with the questions he already answered
             // The result is an array of question Ids the user is allowed to answer (or an empty array)
-            var diff = $(questionIds).not(answeredQuestionIds).get();
+            var a = [], diff = [];
+            for (var i1 = 0; i1 < answeredQuestionIds.length; i1++) {
+                a[answeredQuestionIds[i1]] = true;
+            }
+
+            for (var i2 = 0; i2 < questionIds.length; i2++) {
+                if (a[questionIds[i2]]) {
+                    delete a[questionIds[i2]];
+                } else {
+                    a[questionIds[i2]] = true;
+                }
+            }
+
+            for (var i3 in a) {
+                diff.push(i3);
+            }
 
             console.log(answeredQuestionIds);
             console.log(questionIds);
