@@ -167,8 +167,7 @@ if (Meteor.isServer) {
                 createdAt: new Date(),
                 owner: Meteor.userId(),
                 username: Meteor.user().username,
-                participants: 0,
-                answersReceived: 0
+                participants: 0
             });
         },
         incParticipants: function(sessionId) {
@@ -177,8 +176,8 @@ if (Meteor.isServer) {
         decParticipants: function(sessionId) {
             Sessions.update({sessionId: sessionId}, {$inc : { participants : -1 }});
         },
-        incAnswers: function(sessionId) {
-            Sessions.update({sessionId: sessionId}, {$inc : { answersReceived : 1 }});
+        incAnswers: function(questId) {
+            Questions.update({_id: questId}, {$inc : { answersReceived : 1 }});
         },
         insertAnswer: function(answer, sessionId, userId) {
             // Get the question Ids the user already answered to
@@ -220,7 +219,7 @@ if (Meteor.isServer) {
                             var toInsert = [answer[i][0], userId];
                             console.log("Inserting: " + toInsert + " into " + diff[j]);
                             Questions.update({_id: diff[j]}, {$push : { answers: toInsert}});
-                            Meteor.call("incAnswers", sessionId);
+                            Meteor.call("incAnswers", diff[j]);
                             break;
                         }
                     }
@@ -254,7 +253,8 @@ if (Meteor.isServer) {
                 owner: owner,
                 type: text,
                 question: text,
-                answers: []
+                answers: [],
+                answersReceived: 0
             });
         }
     });

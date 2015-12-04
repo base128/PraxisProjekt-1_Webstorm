@@ -51,8 +51,6 @@
 
         <p>Participants: {{participants}}</p>
 
-        <p>Answers received: {{answersReceived}}</p>
-
         <div class="divider"></div>
 
         <div class="row">
@@ -105,7 +103,6 @@
 
 <template name="questionTemplate">
     <tr class="questionsRow">
-        {{log this}}
         {{#if isOwner}}
             <td rowspan="2"><span>{{question}}</span></td>
         {{/if}}
@@ -124,9 +121,8 @@
                 <span class ="pre">Yes: {{answersYes}}</span>
             </td>
             <td rowspan="2">
-                <span class="pre">DANEBEN</span>
+                <span class="pre">{{answersReceived}}</span>
             </td>
-
 
             <td rowspan="2">
                 <button class="btnDelQuestion">Delete</button>
