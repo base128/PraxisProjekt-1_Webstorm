@@ -71,7 +71,7 @@ if (Meteor.isClient) {
                     var radioButtons = forms[i].getElementsByClassName("YesNoRadioButtons");
                     for(var j = 0; j < 2; j++) {
                         if(radioButtons[j].checked) {
-                            answer.push([radioButtons[j].value, forms[i]["questId"]]);
+                            answer.push([radioButtons[j].value, jQuery(forms[i]).data("questid")]);
                         }
                     }
                 }
@@ -87,7 +87,7 @@ if (Meteor.isClient) {
         isOwner: function () {
             return this.owner === Meteor.userId();
         },
-        answers2: function() {
+        answersYes: function() {
             var answersCursor = Questions.find({_id:this._id});
             var answers = [];
 
@@ -96,18 +96,34 @@ if (Meteor.isClient) {
             });
 
             if(answers.length > 0) {
-                var yesCount = 0, noCount = 0;
+                var yesCount = 0;
 
                 for(var j = 0; j < answers[0].length; j++) {
                     if(answers[0][j][0] == "yes") {
                         yesCount = yesCount + 1;
-                    } else if(answers[0][j][0] == "no") {
+                    }
+                }
+                return yesCount;
+            }
+            return answers;
+        },
+        answersNo: function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function(bla) {
+                answers.push(bla.answers);
+            });
+
+            if(answers.length > 0) {
+                var noCount = 0;
+
+                for(var j = 0; j < answers[0].length; j++) {
+                    if(answers[0][j][0] == "no") {
                         noCount = noCount + 1;
                     }
                 }
-
-                //return answers[0].length;
-                return "Yes: " + yesCount + "\n No: " + noCount;
+                return noCount;
             }
             return answers;
         }
@@ -196,12 +212,10 @@ if (Meteor.isServer) {
                 diff.push(i3);
             }
 
-            console.log(answeredQuestionIds);
-            console.log(questionIds);
-
             if(diff.length != 0) {
                 for(var i = 0; i < answer.length; i++) {
                     for(var j = 0; j < diff.length; j++) {
+                        console.log("Answer["+i+"]: " + answer[i][1]);
                         if(answer[i][1] == diff[j]) {
                             var toInsert = [answer[i][0], userId];
                             console.log("Inserting: " + toInsert + " into " + diff[j]);
