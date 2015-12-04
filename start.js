@@ -184,23 +184,21 @@ if (Meteor.isServer) {
             console.log(answeredQuestionIds);
             console.log(questionIds);
 
-            for(var i = 0; i < answer.length; i++) {
-                for(var j = 0; j < diff.length; j++) {
-                    if(answer[i][1] == diff[j]) {
-                        var toInsert = [answer[i][0], userId];
-                        console.log("Inserting: " + toInsert + " into " + diff[j]);
-                        Questions.update({_id: qId}, {$push : { answers: toInsert}});
+            if(diff.length != 0) {
+                for(var i = 0; i < answer.length; i++) {
+                    for(var j = 0; j < diff.length; j++) {
+                        if(answer[i][1] == diff[j]) {
+                            var toInsert = [answer[i][0], userId];
+                            console.log("Inserting: " + toInsert + " into " + diff[j]);
+                            Questions.update({_id: diff[j]}, {$push : { answers: toInsert}});
+                            Meteor.call("incAnswers", sessionId);
+                            break;
+                        }
                     }
                 }
             }
 
-            /*for(var i = 0; i < answer.length; i++) {
-                var toInsert = [answer[i], userId];
-                var qId = questionIds[i];
-                console.log("Inserting: " + toInsert + " into " + qId);
-                Questions.update({_id: qId}, {$push : { answers: toInsert}});
-            }*/
-            Meteor.call("incAnswers", sessionId);
+
         },
         terminateSession: function (sessionId) {
             Meteor.call("terminateQuestions", sessionId);
