@@ -184,12 +184,13 @@ if (Meteor.isServer) {
             console.log(answeredQuestionIds);
             console.log(questionIds);
 
-            for(var i = 0; i < diff.length; i++) {
-                if(answer[i][1] == diff[i]) {
-                    var toInsert = [answer[i][0], userId];
-                    var qId = diff[i];
-                    console.log("Inserting: " + toInsert + " into " + qId);
-                    Questions.update({_id: qId}, {$push : { answers: toInsert}});
+            for(var i = 0; i < answer.length; i++) {
+                for(var j = 0; j < diff.length; j++) {
+                    if(answer[i][1] == diff[j]) {
+                        var toInsert = [answer[i][0], userId];
+                        console.log("Inserting: " + toInsert + " into " + diff[j]);
+                        Questions.update({_id: qId}, {$push : { answers: toInsert}});
+                    }
                 }
             }
 
