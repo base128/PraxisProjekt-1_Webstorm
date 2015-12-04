@@ -84,7 +84,7 @@
             <tr class="trHeader">
                 <th>Question</th>
                 {{#if isOwner}}
-                    <th>Answers</th>
+                    <th colspan="2">Answers</th>
                     <th>Deletion</th>
                 {{else}}
                     <th>Option</th>
@@ -106,8 +106,11 @@
 <template name="questionTemplate">
     <tr class="questionsRow">
         {{log this}}
-        <td><span>{{question}}</span></td>
+        {{#if isOwner}}
+            <td rowspan="2"><span>{{question}}</span></td>
+        {{/if}}
         {{#unless isOwner}}
+            <td><span>{{question}}</span></td>
             <td>
                 <form class="formYesNoAnswer" data-questId="{{this._id}}">
                     <input type="radio" class="YesNoRadioButtons" name="yesNo" value="yes">Yes
@@ -120,9 +123,19 @@
             <td>
                 <span class="pre">Yes: {{answersYes}} | No: {{answersNo}}</span>
             </td>
-            <td>
+            <td rowspan="2">
+                <span class="pre">DANEBEN</span>
+            </td>
+
+
+            <td rowspan="2">
                 <button class="btnDelQuestion">Delete</button>
             </td>
         {{/if}}
     </tr>
+    {{#if isOwner}}
+        <tr>
+            <td><span class="pre">Fuck U</span></td>
+        </tr>
+    {{/if}}
 </template>
