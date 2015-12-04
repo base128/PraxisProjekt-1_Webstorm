@@ -59,6 +59,10 @@
             {{#if isOwner}}
                 <div class="col-sm-6 col-xs-12">
                     <form id="formQuestion">
+                        <select name="type">
+                            <option value="YesNo">Yes/No-Question</option>
+                            <option value="multi">Multiple Choice Question</option>
+                        </select>
                         <input type="text" name="questionTxt">
                         <br/>
                         <button type="submit" class="btnAddQuestion">Add this question</button>

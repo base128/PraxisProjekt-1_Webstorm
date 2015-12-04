@@ -165,21 +165,43 @@ if (Meteor.isServer) {
             Sessions.update({sessionId: sessionId}, {$inc : { answersReceived : 1 }});
         },
         insertAnswer: function(answer, sessionId, userId) {
-            Meteor.call("incAnswers", sessionId);
+            // Get the question Ids the user already answered to
+            var answeredQuestionsIdsCursor = Questions.find({"answers":{$elemMatch:{$elemMatch:{$in:[userId]}}}}, {_id:1});
+            var answeredQuestionIds = [];
 
+            answeredQuestionsIdsCursor.forEach(function(bla) {answeredQuestionIds.push(bla._id)});
+
+            // Get the question Ids the user is trying to answer
             var questionIdsCursor = Questions.find({sessionId:sessionId}, {_id:1});
 
             var questionIds = [];
 
             questionIdsCursor.forEach(function(post) { questionIds.push(post._id) });
 
-            console.log(questionIds);
+            // Compare the two arrays
+            var continueAllowed = true;
 
-            for(var i = 0; i < answer.length; i++) {
-                var toInsert = [answer[i], userId];
-                var qId = questionIds[i];
-                console.log("Inserting: " + toInsert + " into " + qId);
-                Questions.update({_id: qId}, {$push : { answers: toInsert}});
+            if(answeredQuestionIds.length != questionIds) {
+                continueAllowed = false;
+            } else {
+                for(var j = 0; j < questionIds.length; j++) {
+                    for(var k = 0; k < answeredQuestionIds.length; k++) {
+
+                    }
+                }
+            }
+
+            if(continueAllowed) {
+                console.log(answeredQuestionIds);
+                console.log(questionIds);
+
+                for(var i = 0; i < answer.length; i++) {
+                    var toInsert = [answer[i], userId];
+                    var qId = questionIds[i];
+                    console.log("Inserting: " + toInsert + " into " + qId);
+                    Questions.update({_id: qId}, {$push : { answers: toInsert}});
+                }
+                Meteor.call("incAnswers", sessionId);
             }
         },
         terminateSession: function (sessionId) {
