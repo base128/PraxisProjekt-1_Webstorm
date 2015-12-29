@@ -55,20 +55,25 @@
 
         <div class="row">
             {{#if isOwner}}
-                <div class="col-sm-6 col-xs-12">
+                <div>
+                    <button type="submit" class="btnTerminate">Terminate Session</button>
+                </div>
+
+                <div>
                     <form id="formQuestion">
-                        <select name="type">
+                        <select id="questionType" name="questionType">
                             <option value="YesNo">Yes/No-Question</option>
                             <option value="multi">Multiple Choice Question</option>
                         </select>
                         <input type="text" name="questionTxt">
                         <br/>
+                        {{#if TypeMulti}}
+                            {{>MultiAnswer}}
+                        {{/if}}
                         <button type="submit" class="btnAddQuestion">Add this question</button>
                     </form>
                 </div>
-                <div class="col-sm-6 col-xs-12">
-                    <button type="submit" class="btnTerminate">Terminate Session</button>
-                </div>
+
 
             {{else}}
                 <div class="col-sm-12">
@@ -85,7 +90,7 @@
                     <th colspan="2">Answers</th>
                     <th>Deletion</th>
                 {{else}}
-                    <th>Option</th>
+                    <th>Options</th>
                 {{/if}}
 
             </tr>
@@ -104,34 +109,78 @@
 <template name="questionTemplate">
     <tr class="questionsRow">
         {{#if isOwner}}
-            <td rowspan="2"><span>{{question}}</span></td>
+            {{#if isYesNo}}
+                <td rowspan="2"><span>{{question}}</span></td>
+            {{/if}}
+            {{#if isMulti}}
+                <td rowspan="4"><span>{{question}}</span></td>
+            {{/if}}
         {{/if}}
         {{#unless isOwner}}
             <td><span>{{question}}</span></td>
             <td>
+            {{#if isYesNo}}
                 <form class="formYesNoAnswer" data-questId="{{this._id}}">
                     <input type="radio" class="YesNoRadioButtons" name="yesNo" value="yes">Yes
                     <input type="radio" class="YesNoRadioButtons" name="yesNo" value="no">No
                 </form>
+            {{/if}}
+
+            {{#if isMulti}}
+                <form class="formMultiAnswer" data-questId="{{this._id}}">
+                    <input type="radio" class="MultiRadioButtons" name="multi" value="choice1"> {{choice1}}
+                    <input type="radio" class="MultiRadioButtons" name="multi" value="choice2"> {{choice2}}
+                    <input type="radio" class="MultiRadioButtons" name="multi" value="choice3"> {{choice3}}
+                    <input type="radio" class="MultiRadioButtons" name="multi" value="choice4"> {{choice4}}
+                </form>
+            {{/if}}
             </td>
         {{/unless}}
 
         {{#if isOwner}}
-            <td>
-                <span class ="pre">Yes: {{answersYes}}</span>
-            </td>
-            <td rowspan="2">
-                <span class="pre">{{answersReceived}}</span>
-            </td>
+            {{#if isYesNo}}
+                <td>
+                    <span class="pre">Yes: {{answersYes}}</span>
+                </td>
+                <td rowspan="2">
+                    <span class="pre">{{answersReceived}}</span>
+                </td>
 
-            <td rowspan="2">
-                <button class="btnDelQuestion">Delete</button>
-            </td>
+                <td rowspan="2">
+                    <button class="btnDelQuestion">Delete</button>
+                </td>
+            {{/if}}
+            {{#if isMulti}}
+                <td><span class="pre">"{{choice1}}": {{answersChoice1}}</span></td>
+                <td rowspan="4"><span class="pre">{{answersReceived}}</span></td>
+                <td rowspan="4"><button class ="btnDelQuestion">Delete</button></td>
+            {{/if}}
         {{/if}}
     </tr>
     {{#if isOwner}}
-        <tr>
-            <td><span class="pre">No: {{answersNo}}</span></td>
-        </tr>
+        {{#if isYesNo}}
+            <tr>
+                <td><span class="pre">No: {{answersNo}}</span></td>
+            </tr>
+        {{/if}}
+        {{#if isMulti}}
+            <tr>
+                <td><span class="pre">"{{choice2}}": {{answersChoice2}}</span></td>
+            </tr>
+            <tr>
+                <td><span class="pre">"{{choice3}}": {{answersChoice3}}</span></td>
+            </tr>
+            <tr>
+                <td><span class="pre">"{{choice4}}": {{answersChoice4}}</span></td>
+            </tr>
+
+        {{/if}}
     {{/if}}
+</template>
+
+<template name="MultiAnswer">
+    <input class="MultiInput" type="text" id="choice1" name="choice1">
+    <input class="MultiInput" type="text" id="choice2" name="choice2">
+    <input class="MultiInput" type="text" id="choice3" name="choice3">
+    <input class="MultiInput" type="text" id="choice4" name="choice4">
 </template>

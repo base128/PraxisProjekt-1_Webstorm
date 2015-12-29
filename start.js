@@ -47,6 +47,18 @@ if (Meteor.isClient) {
         },
         questions: function () {
             return Questions.find({owner: this.owner})
+        },
+        /**
+         * @return {boolean}
+         */
+        TypeYesNo: function() {
+            return Session.get("YesNo");
+        },
+        /**
+         * @return {boolean}
+         */
+        TypeMulti: function() {
+            return Session.get("multi");
         }
     });
 
@@ -60,8 +72,23 @@ if (Meteor.isClient) {
         "submit #formQuestion": function (event) {
             event.preventDefault();
             var text = event.target.questionTxt.value;
+            var type = event.target.questionType.value;
+            var choices = [];
+            if(type == "multi") {
+                var fields = document.getElementsByClassName("MultiInput");
+
+                choices[0] = fields[0].value;
+                choices[1] = fields[1].value;
+                choices[2] = fields[2].value;
+                choices[3] = fields[3].value;
+
+                fields[0].value = "";
+                fields[1].value = "";
+                fields[2].value = "";
+                fields[3].value = "";
+            }
             event.target.questionTxt.value = "";
-            Meteor.call("addQuestion", this.sessionId, text, this.owner);
+            Meteor.call("addQuestion", this.sessionId, text, this.owner, type, choices);
         },
         "click #btnSubmitAnswers": function() {
             var forms = document.getElementsByClassName("formYesNoAnswer");
@@ -75,11 +102,37 @@ if (Meteor.isClient) {
                         }
                     }
                 }
-
-                Meteor.call("insertAnswer", answer, this.sessionId, Meteor.userId());
             }
+
+            var forms2 = document.getElementsByClassName("formMultiAnswer");
+            if(forms2.length > 0) {
+                for(var k = 0; k < forms2.length; k++) {
+                    var radioButtons2 = forms2[k].getElementsByClassName("MultiRadioButtons");
+                    for(var l = 0; l < 4; l++) {
+                        if(radioButtons2[l].checked) {
+                            answer.push([radioButtons2[l].value, jQuery(forms2[k]).data("questid")]);
+                        }
+                    }
+                }
+            }
+
+            if(answer.length > 0)
+                Meteor.call("insertAnswer", answer, this.sessionId, Meteor.userId());
+        },
+        "change #questionType": function() {
+            var type = document.getElementById("questionType").value;
+            Session.set("multi", null);
+            Session.set("YesNo", null);
+
+            Session.set(type, type);
         }
     });
+
+
+
+    Template.sessionCreated.rendered = function() {
+
+    };
     //endregion
 
     //region Template questionTemplate
@@ -124,6 +177,140 @@ if (Meteor.isClient) {
                     }
                 }
                 return noCount;
+            }
+            return answers;
+        },
+        isYesNo: function() {
+            var typeC = Questions.find({_id:this._id}, {_id:0, type:1});
+            var type = null;
+            typeC.forEach(function(bla) {type = bla.type});
+
+            return type==="YesNo";
+        },
+        isMulti: function() {
+            var typeC = Questions.find({_id:this._id}, {_id:0, type:1});
+            var type = null;
+            typeC.forEach(function(bla) {type = bla.type});
+
+            return type==="multi";
+        },
+        choice1:function() {
+            var choicesC = Questions.find({_id:this._id}, {_id:0, choices:1});
+            var choices = [];
+
+            choicesC.forEach(function(bla) {choices = bla.choices});
+
+            if(choices.length == 4) {
+                return choices[0];
+            } else {
+                return null;
+            }
+        },
+        choice2:function() {
+            var choicesC = Questions.find({_id:this._id}, {_id:0, choices:1});
+            var choices = [];
+
+            choicesC.forEach(function(bla) {choices = bla.choices});
+
+            if(choices.length == 4) {
+                return choices[1];
+            } else {
+                return null;
+            }
+        },
+        choice3:function() {
+            var choicesC = Questions.find({_id:this._id}, {_id:0, choices:1});
+            var choices = [];
+
+            choicesC.forEach(function(bla) {choices = bla.choices});
+
+            if(choices.length == 4) {
+                return choices[2];
+            } else {
+                return null;
+            }
+        },
+        choice4:function() {
+            var choicesC = Questions.find({_id:this._id}, {_id:0, choices:1});
+            var choices = [];
+
+            choicesC.forEach(function(bla) {choices = bla.choices});
+
+            if(choices.length == 4) {
+                return choices[3];
+            } else {
+                return null;
+            }
+        },
+        answersChoice1:function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function (bla) {answers.push(bla.answers)});
+
+            if(answers.length > 0) {
+                var choice1Count = 0;
+
+                for(var i = 0; i < answers[0].length; i++) {
+                    if(answers[0][i][0] == "choice1") {
+                        choice1Count = choice1Count + 1;
+                    }
+                }
+                return choice1Count;
+            }
+            return answers;
+        },
+        answersChoice2:function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function (bla) {answers.push(bla.answers)});
+
+            if(answers.length > 0) {
+                var choice1Count = 0;
+
+                for(var i = 0; i < answers[0].length; i++) {
+                    if(answers[0][i][0] == "choice2") {
+                        choice1Count = choice1Count + 1;
+                    }
+                }
+                return choice1Count;
+            }
+            return answers;
+        },
+        answersChoice3:function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function (bla) {answers.push(bla.answers)});
+
+            if(answers.length > 0) {
+                var choice1Count = 0;
+
+                for(var i = 0; i < answers[0].length; i++) {
+                    if(answers[0][i][0] == "choice3") {
+                        choice1Count = choice1Count + 1;
+                    }
+                }
+                return choice1Count;
+            }
+            return answers;
+        },
+        answersChoice4:function() {
+            var answersCursor = Questions.find({_id:this._id});
+            var answers = [];
+
+            answersCursor.forEach(function (bla) {answers.push(bla.answers)});
+
+            if(answers.length > 0) {
+                var choice1Count = 0;
+
+                for(var i = 0; i < answers[0].length; i++) {
+                    if(answers[0][i][0] == "choice4") {
+                        choice1Count = choice1Count + 1;
+                    }
+                }
+                return choice1Count;
             }
             return answers;
         }
@@ -214,10 +401,8 @@ if (Meteor.isServer) {
             if(diff.length != 0) {
                 for(var i = 0; i < answer.length; i++) {
                     for(var j = 0; j < diff.length; j++) {
-                        console.log("Answer["+i+"]: " + answer[i][1]);
                         if(answer[i][1] == diff[j]) {
                             var toInsert = [answer[i][0], userId];
-                            console.log("Inserting: " + toInsert + " into " + diff[j]);
                             Questions.update({_id: diff[j]}, {$push : { answers: toInsert}});
                             Meteor.call("incAnswers", diff[j]);
                             break;
@@ -225,8 +410,6 @@ if (Meteor.isServer) {
                     }
                 }
             }
-
-
         },
         terminateSession: function (sessionId) {
             Meteor.call("terminateQuestions", sessionId);
@@ -247,14 +430,15 @@ if (Meteor.isServer) {
                 text += possible.charAt(Math.floor(Math.random() * possible.length));
             return text;
         },
-        addQuestion: function (sessionId, text, owner) {
+        addQuestion: function (sessionId, text, owner, type, choices) {
             Questions.insert({
                 sessionId: sessionId,
                 owner: owner,
-                type: text,
+                type: type,
                 question: text,
                 answers: [],
-                answersReceived: 0
+                answersReceived: 0,
+                choices: choices
             });
         }
     });
