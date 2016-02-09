@@ -1,0 +1,65 @@
+<template name="sessionCreated">
+    <h2>Session View</h2>
+    {{#each session}}
+        <p>SessionID: {{sessionId}}</p>
+
+        <p>Owner: {{username}}</p>
+
+        <p>Current User: {{#if currentUser}}{{currentUser.username}}{{else}}Anonymous{{/if}}</p>
+
+        <p>Participants: {{participants}}</p>
+
+        <div class="divider"></div>
+
+        <div class="row">
+            {{#if isOwner}}
+                <div>
+                    <button type="submit" class="btnTerminate">Terminate Session</button>
+                </div>
+
+                <div>
+                    <form id="formQuestion">
+                        <select id="questionType" name="questionType">
+                            <option value="YesNo">Yes/No-Question</option>
+                            <option value="multi">Multiple Choice Question</option>
+                        </select>
+                        <input type="text" name="questionTxt">
+                        <br/>
+                        {{#if TypeMulti}}
+                            {{>MultiAnswer}}
+                        {{/if}}
+                        <button type="submit" class="btnAddQuestion">Add this question</button>
+                    </form>
+                </div>
+
+
+            {{else}}
+                <div class="col-sm-12">
+                    <button type="submit" class="btnLeave">Leave Session</button>
+                </div>
+            {{/if}}
+        </div>
+        <div class="divider clearfix"></div>
+
+        <table border="1" class="questionsTable">
+            <tr class="trHeader">
+                <th>Question</th>
+                {{#if isOwner}}
+                    <th colspan="2">Answers</th>
+                    <th>Deletion</th>
+                {{else}}
+                    <th>Options</th>
+                {{/if}}
+
+            </tr>
+            {{#each questions}}
+                {{>questionTemplate}}
+            {{/each}}
+        </table>
+
+        {{#unless isOwner}}
+            <br/>
+            <button type="button" id="btnSubmitAnswers">Submit answers</button>
+        {{/unless}}
+    {{/each}}
+</template>
